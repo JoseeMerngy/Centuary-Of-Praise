@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Centuary of Raise - Members</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial; background: #0f0f0f; color: #fff; margin: 0; padding: 0; }
+    header { background: #1a1a1a; padding: 20px; text-align: center; font-size: 24px; }
+    .container { padding: 20px; max-width: 600px; margin: auto; }
+    .member-card { background: #222; padding: 15px; margin-bottom: 10px; border-radius: 10px; }
+    input, button { padding: 10px; margin-top: 10px; width: 100%; border-radius: 5px; border: none; }
+    button { background: #28a745; color: white; cursor: pointer; }
+    #adminPanel { display: none; }
+  </style>
+</head>
+<body>
+
+<header>Centuary of Raise - Church Members</header>
+<div class="container">
+
+  <!-- Admin Login -->
+  <div id="loginPanel">
+    <h3>Admin Login</h3>
+    <input type="password" id="adminPass" placeholder="Enter Admin Password">
+    <button onclick="checkLogin()">Login</button>
+  </div>
+
+  <!-- Admin Member Form -->
+  <div id="adminPanel">
+    <h3>Add Member</h3>
+    <input type="text" id="name" placeholder="Full Name">
+    <input type="text" id="role" placeholder="Role in Church">
+    <button onclick="addMember()">Add Member</button>
+    <hr>
+  </div>
+
+  <!-- Members Display -->
+  <h3>Church Members</h3>
+  <div id="membersList">Loading members...</div>
+</div>
+
+<!-- Firebase -->
+<script type="module">
+  // YOUR FIREBASE CONFIG HERE
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "XXXX",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Load Members
+  async function loadMembers() {
+    const listDiv = document.getElementById('membersList');
+    listDiv.innerHTML = "";
+    const querySnapshot = await getDocs(collection(db, "members"));
+    querySnapshot.forEach((doc) => {
+      const member = doc.data();
+      listDiv.innerHTML += `
+        <div class="member-card">
+          <strong>${member.name}</strong><br>
+          <em>${member.role}</em>
+        </div>
+      `;
+    });
+  }
+
+  loadMembers();
+
+  // Admin Login
+  function checkLogin() {
+    const pass = document.getElementById("adminPass").value;
+    if (pass === "century2025") {
+      document.getElementById("adminPanel").style.display = "block";
+      document.getElementById("loginPanel").style.display = "none";
+    } else {
+      alert("Incorrect password!");
+    }
+  }
+
+  // Add Member
+  async function addMember() {
+    const name = document.getElementById("name").value.trim();
+    const role = document.getElementById("role").value.trim();
+    if (name === "" || role === "") return alert("Fill in all fields");
+    await addDoc(collection(db, "members"), { name, role });
+    alert("Member added!");
+    document.getElementById("name").value = "";
+    document.getElementById("role").value = "";
+    loadMembers();
+  }
+</script>
+</body>
+</html>
