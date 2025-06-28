@@ -1,1 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Centuary of Raise Church</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0a0a0a;
+      color: #f1f1f1;
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(to right, #000000, #1f1f1f);
+      padding: 2rem;
+      text-align: center;
+      color: #00ffff;
+    }
+    nav {
+      text-align: center;
+      background-color: #111;
+      padding: 1rem;
+    }
+    nav a {
+      color: #00ffff;
+      margin: 0 1rem;
+      text-decoration: none;
+    }
+    section {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+    h2 {
+      color: #00ffff;
+    }
+    form {
+      background-color: #1c1c1c;
+      padding: 1rem;
+      border-radius: 10px;
+      display: none;
+      margin-top: 1rem;
+    }
+    input, button {
+      width: 100%;
+      padding: 0.8rem;
+      margin-top: 0.5rem;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background-color: #00ffff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      background-color: #1e1e1e;
+      padding: 1rem;
+      margin-top: 1rem;
+      border-radius: 10px;
+    }
+    footer {
+      background: #111;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
 
+<header>
+  <h1>Centuary of Raise</h1>
+  <p>Walking in Light | Living in Truth | Raising a Godly Generation</p>
+</header>
+
+<nav>
+  <a href="#about">About Us</a>
+  <a href="#members">Our Members</a>
+  <a href="#admin">Admin</a>
+</nav>
+
+<section id="about">
+  <h2>About Our Church</h2>
+  <p>Centuary of Raise is a growing family of believers rooted in the love of Christ and committed to raising godly leaders who transform the world through truth, light, and service. We believe in the power of worship, the integrity of Scripture, and the unity of the body of Christ.</p>
+
+  <h3>Our Vision</h3>
+  <p>To raise a century of believers fully equipped in faith, leadership, and purpose to influence nations for Christ.</p>
+
+  <h3>Our Mission</h3>
+  <ul>
+    <li>To nurture a spirit-filled generation through teaching and discipleship</li>
+    <li>To empower young people to live holy and purposeful lives</li>
+    <li>To serve the community through love, charity, and truth</li>
+  </ul>
+
+  <h3>Our Leadership</h3>
+  <p>Led by Pastor Charles and supported by Minister Esther and a strong team of youth leaders, the church stands as a beacon of hope, worship, and spiritual growth.</p>
+</section>
+
+<section id="members">
+  <h2>Our Registered Members</h2>
+  <ul id="membersList"></ul>
+</section>
+
+<section id="admin">
+  <h2>Admin Access</h2>
+  <div id="loginForm">
+    <input type="password" id="adminPass" placeholder="Enter Admin Password">
+    <button onclick="login()">Login as Admin</button>
+  </div>
+
+  <form id="registerForm">
+    <h3>Register New Member</h3>
+    <input type="text" id="name" placeholder="Full Name" required>
+    <input type="text" id="phone" placeholder="Phone Number" required>
+    <input type="text" id="location" placeholder="Location" required>
+    <button type="submit">Add Member</button>
+  </form>
+</section>
+
+<footer>
+  &copy; 2025 Centuary of Raise. All rights reserved. Powered by faith and technology.
+</footer>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+<script>
+  // 🚀 Replace these values with your Firebase config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    databaseURL: "YOUR_DB_URL",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_BUCKET",
+    messagingSenderId: "YOUR_MSG_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  const adminPassword = "secret123"; // change to your actual admin password
+
+  function login() {
+    const inputPass = document.getElementById('adminPass').value;
+    if (inputPass === adminPassword) {
+      document.getElementById('registerForm').style.display = 'block';
+      document.getElementById('loginForm').style.display = 'none';
+    } else {
+      alert("Wrong password!");
+    }
+  }
+
+  document.getElementById('registerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const phone = document.getElementById('phone').value;
+    const location = document.getElementById('location').value;
+
+    const newMember = {
+      name, phone, location
+    };
+
+    db.ref('members').push(newMember);
+    document.getElementById('registerForm').reset();
+    alert("Member Registered Successfully!");
+  });
+
+  db.ref('members').on('value', (snapshot) => {
+    const members = snapshot.val();
+    const list = document.getElementById('membersList');
+    list.innerHTML = '';
+
+    for (let id in members) {
+      const m = members[id];
+      const li = document.createElement('li');
+      li.textContent = `Name: ${m.name} | Phone: ${m.phone} | Location: ${m.location}`;
+      list.appendChild(li);
+    }
+  });
+</script>
+
+</body>
+</html>
